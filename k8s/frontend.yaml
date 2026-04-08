@@ -16,7 +16,7 @@ spec:
         - name: acr-auth
       containers:
         - name: frontend
-          image: frontend:latest
+          image: test25090010acr.azurecr.io/frontend:latest
           ports:
             - containerPort: 80
 ---

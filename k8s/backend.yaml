@@ -16,7 +16,7 @@ spec:
         - name: acr-auth
       containers:
         - name: backend
-          image: backend:latest
+          image: test25090010acr.azurecr.io/backend:latest
           ports:
             - containerPort: 5000
 ---
