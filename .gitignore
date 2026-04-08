@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# React build output
+frontend/code/build/
+
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.production
+
+# Docker
+.dockerignore
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
