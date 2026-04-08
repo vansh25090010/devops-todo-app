@@ -22,27 +22,36 @@ jobs:
       - name: Azure login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+          login-type: default
+          
+      - name: Docker login to ACR
+        run: echo "$ACR_PASSWORD" | docker login "$ACR_NAME.azurecr.io" -u "$ACR_USERNAME" --password-stdin
 
       - name: Build and push backend
-        run: az acr build --registry $ACR_NAME --image backend:latest ./backend
+        run: |
+          docker build -t "$ACR_NAME.azurecr.io/backend:latest" ./backend
+          docker push "$ACR_NAME.azurecr.io/backend:latest"
 
       - name: Build and push frontend
-        run: az acr build --registry $ACR_NAME --image frontend:latest --build-arg REACT_APP_API_URL=http://backend-service:5000/todos ./frontend
+        run: |
+          docker build -t "$ACR_NAME.azurecr.io/frontend:latest" --build-arg REACT_APP_API_URL=http://backend-service:5000/todos ./frontend
+          docker push "$ACR_NAME.azurecr.io/frontend:latest"
 
       - name: Get AKS credentials
         run: az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_NAME --overwrite-existing
 
-      - name: Deploy to AKS
-        run: |
-          ACR_LOGIN_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
-          kubectl create secret docker-registry acr-auth \
-            --docker-server=$ACR_LOGIN_SERVER \
-            --docker-username=$ACR_USERNAME \
-            --docker-password=$ACR_PASSWORD \
-            --dry-run=client -o yaml | kubectl apply -f -
-          kubectl apply -f k8s/backend.yaml
-          kubectl apply -f k8s/frontend.yaml
-          kubectl apply -f k8s/ingress.yaml
-          kubectl set image deployment/backend backend=${ACR_LOGIN_SERVER}/backend:latest
-          kubectl set image deployment/frontend frontend=${ACR_LOGIN_SERVER}/frontend:latest
+      # - name: Deploy to AKS
+      #   run: |
+      #     ACR_LOGIN_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
+      #     kubectl create secret docker-registry acr-auth \
+      #       --docker-server=$ACR_LOGIN_SERVER \
+      #       --docker-username=$ACR_USERNAME \
+      #       --docker-password=$ACR_PASSWORD \
+      #       --dry-run=client -o yaml | kubectl apply -f -
+      #     kubectl apply -f k8s/backend.yaml
+      #     kubectl apply -f k8s/frontend.yaml
+      #     kubectl apply -f k8s/ingress.yaml
+      #     kubectl set image deployment/backend backend=${ACR_LOGIN_SERVER}/backend:latest
+      #     kubectl set image deployment/frontend frontend=${ACR_LOGIN_SERVER}/frontend:latest
