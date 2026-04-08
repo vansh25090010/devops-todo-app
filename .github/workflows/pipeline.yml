@@ -6,12 +6,12 @@ on:
       - main
 
 env:
-  ACR_NAME: ${{ secrets.ACR_NAME }}
-  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-  AKS_NAME: ${{ vars.AKS_NAME }}
+  ACR_NAME: test25090010acr
+  # RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+  # AKS_NAME: ${{ vars.AKS_NAME }}
   ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
   ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
-  ACR_LOGIN_SERVER: ${{ secrets.ACR_NAME }}.azurecr.io
+  ACR_LOGIN_SERVER: test25090010acr.azurecr.io
 
 jobs:
   build-and-deploy:
